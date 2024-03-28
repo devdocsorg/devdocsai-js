@@ -1,0 +1,17 @@
+{
+  "name": "@devdocsai/css",
+  "version": "0.19.0",
+  "description": "Common CSS for DevDocs.ai components",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devdocsorg/devdocsai-js.git",
+    "directory": "packages/css"
+  },
+  "main": "devdocsai.css",
+  "types": "./index.d.ts",
+  "files": [
+    "devdocsai.css",
+    "index.d.ts"
+  ]
+}

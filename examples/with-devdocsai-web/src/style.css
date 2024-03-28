@@ -1,0 +1,48 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: #737373;
+  background-color: #f5f5f5;
+  font-synthesis: none;
+  text-rendering: optimizelegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+button {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+body,
+#app {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+main {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.centered {
+  display: grid;
+  place-items: center;
+}
+
+/* We make the container fill the entire screen to accommodate for
+   the `display: "plain"` case.
+*/
+#devdocsai {
+  position: absolute;
+  inset: 0;
+}

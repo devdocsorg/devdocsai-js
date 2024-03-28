@@ -1,0 +1,8 @@
+.docusaurus/
+.next/
+build/
+coverage/
+dist/
+.changeset/
+**/CHANGELOG.md
+**/README.md

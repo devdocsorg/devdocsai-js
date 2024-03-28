@@ -1,0 +1,24 @@
+{
+  "include": ["src"],
+  "references": [{ "path": "../react/tsconfig.build.json" }],
+  "compilerOptions": {
+    "composite": true,
+    "module": "node16",
+    "moduleResolution": "node16",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "rootDir": "src",
+    "strict": true,
+    "jsx": "react",
+    "outDir": "dist",
+    "skipLibCheck": true,
+    "target": "es2021",
+    "isolatedModules": true,
+    "types": ["@docusaurus/module-type-aliases"],
+    "paths": {
+      "@devdocsai/core": ["../core/src"],
+      "@devdocsai/react": ["../react/src"]
+    }
+  }
+}

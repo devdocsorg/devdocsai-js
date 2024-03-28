@@ -1,0 +1,56 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: >
+          npm run build -w with-css-modules -w with-custom-trigger -w
+          with-custom-trigger-react -w with-docusaurus -w
+          with-docusaurus-swizzled -w with-init -w with-devdocsai-web -w
+          with-next
+        env:
+          DEVDOCSAI_PROJECT_KEY: ${{ secrets.DEVDOCSAI_PROJECT_KEY }}
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - uses: codecov/codecov-action@v3
+
+  bundle-size:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+      - run: npm ci
+      - uses: preactjs/compressed-size-action@v2
+        with:
+          build-script: '"build:packages"'
+          pattern: '{./packages/**/dist/**/*.{cjs,js},./packages/css/devdocsai.css}'
+          exclude: '{**/*.map,**/*.d.{ts,cts},**/node_modules/**,./packages/**/node_modules/**/dist/**/*}'
