@@ -133,7 +133,6 @@ export const DevDocsAIIcon = ({
       style={style}
       {...props}
     >
-      <rect width="344" height="344" fill="#000311" />
       <path
         fillRule="evenodd"
         clipRule="evenodd"
