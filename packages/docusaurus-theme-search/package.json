@@ -1,6 +1,6 @@
 {
   "name": "@devdocsai/docusaurus-theme-search",
-  "version": "0.13.14",
+  "version": "0.14.0",
   "description": "A DevDocs.ai search theme for Docusaurus",
   "repository": {
     "type": "git",
@@ -22,8 +22,8 @@
   },
   "dependencies": {
     "@docusaurus/types": "^2.4.1",
-    "@devdocsai/css": "^0.18.0",
-    "@devdocsai/react": "0.29.0"
+    "@devdocsai/css": "^0.19.0",
+    "@devdocsai/react": "0.30.0"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^2.4.1",
