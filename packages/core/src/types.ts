@@ -29,7 +29,7 @@ export type OpenAIModelId =
 
 export type SourceType =
   | 'github'
-  | 'motif'
+  | 'gitlab'
   | 'website'
   | 'file-upload'
   | 'api-upload'
