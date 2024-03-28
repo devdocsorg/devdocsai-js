@@ -11,6 +11,7 @@
   "dependencies": {
     "@devdocsai/css": "*",
     "@devdocsai/react": "*",
+    "@swc/core": "^1.4.11",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"
   },

@@ -1,5 +1,11 @@
 # @devdocsai/core
 
+## 0.19.1
+
+### Patch Changes
+
+- [`7582fff02781cf44baa489bde5ca7cc3441a9e6b`](https://github.com/devdocsorg/devdocsai-js/commit/7582fff02781cf44baa489bde5ca7cc3441a9e6b) Thanks [@devdocsai](https://github.com/devdocsai)! - Add gitlab
+
 ## 0.19.0
 
 ### Minor Changes
