@@ -1,5 +1,12 @@
 # @devdocsai/react
 
+## 0.30.1
+
+### Patch Changes
+
+- Updated dependencies [[`7582fff02781cf44baa489bde5ca7cc3441a9e6b`](https://github.com/devdocsorg/devdocsai-js/commit/7582fff02781cf44baa489bde5ca7cc3441a9e6b)]:
+  - @devdocsai/core@0.19.1
+
 ## 0.30.0
 
 ### Minor Changes
