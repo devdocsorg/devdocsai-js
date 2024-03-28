@@ -1,0 +1,1 @@
+# @devdocsai/docusaurus-theme-search

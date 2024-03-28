@@ -1,0 +1,27 @@
+{
+  "name": "@devdocsai/core",
+  "version": "0.18.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devdocsorg/devdocsai-js.git",
+    "directory": "packages/core"
+  },
+  "license": "MIT",
+  "sideEffects": false,
+  "type": "module",
+  "exports": "./dist/index.js",
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --build --clean && tsc --build",
+    "dev": "tsc --build --clean && tsc --build --watch",
+    "prepack": "tsc --build --clean && tsc --build"
+  },
+  "dependencies": {
+    "@algolia/client-search": "^4.20.0",
+    "defaults": "^2.0.2",
+    "type-fest": "^4.3.1"
+  }
+}

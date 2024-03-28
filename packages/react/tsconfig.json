@@ -1,0 +1,24 @@
+{
+  "references": [{ "path": "../core" }],
+  "include": ["src/"],
+  "compilerOptions": {
+    "lib": ["dom", "es2022", "esnext"],
+    "composite": true,
+    "module": "node16",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "rootDir": "./src",
+    "strict": true,
+    "jsx": "react",
+    "outDir": "dist",
+    "skipLibCheck": true,
+    "target": "es2021",
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "types": ["@testing-library/jest-dom/vitest"],
+    "paths": {
+      "@devdocsai/core": ["../core/src"]
+    }
+  }
+}

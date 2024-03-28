@@ -1,0 +1,19 @@
+{
+  "name": "with-custom-trigger",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc && vite build",
+    "dev": "vite",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@devdocsai/css": "*",
+    "@devdocsai/web": "*"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react-swc": "^3.3.2",
+    "vite": "^4.4.9"
+  }
+}
