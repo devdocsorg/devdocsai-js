@@ -23,7 +23,7 @@
   "dependencies": {
     "@docusaurus/types": "^2.4.1",
     "@devdocsai/css": "^0.19.0",
-    "@devdocsai/react": "0.30.0"
+    "@devdocsai/react": "0.30.2"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^2.4.1",
