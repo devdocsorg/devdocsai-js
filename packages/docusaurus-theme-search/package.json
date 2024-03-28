@@ -1,6 +1,6 @@
 {
   "name": "@devdocsai/docusaurus-theme-search",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "description": "A DevDocs.ai search theme for Docusaurus",
   "repository": {
     "type": "git",
