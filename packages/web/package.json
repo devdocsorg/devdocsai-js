@@ -1,6 +1,6 @@
 {
   "name": "@devdocsai/web",
-  "version": "0.21.1",
+  "version": "0.21.2",
   "description": "A web component for adding GPT-4 powered search using the DevDocs.ai API.",
   "repository": {
     "type": "git",
