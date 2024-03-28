@@ -1,5 +1,11 @@
 # @devdocsai/react
 
+## 0.30.2
+
+### Patch Changes
+
+- [`cd348be103c35c376a68b1d91900177a7183a61a`](https://github.com/devdocsorg/devdocsai-js/commit/cd348be103c35c376a68b1d91900177a7183a61a) Thanks [@devdocsai](https://github.com/devdocsai)! - Make devdocs icon transparent
+
 ## 0.30.1
 
 ### Patch Changes
