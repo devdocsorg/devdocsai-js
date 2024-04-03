@@ -194,6 +194,10 @@ export interface DevDocsAIOptions {
      * @default "Sorry, it looks like the bot is having a hard time! Please try again in a few minutes."
      */
     errorText?: string;
+    /**
+     * Enables copy to clipboard functionality
+     */
+    allowCopy?: boolean;
   };
   references?: {
     /**
