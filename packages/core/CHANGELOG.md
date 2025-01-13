@@ -1,5 +1,11 @@
 # @devdocsai/core
 
+## 0.20.0
+
+### Minor Changes
+
+- [`87e1ae2771f2539f97597602fb1cceb4f70f51b9`](https://github.com/devdocsorg/devdocsai-js/commit/87e1ae2771f2539f97597602fb1cceb4f70f51b9) Thanks [@devdocsai](https://github.com/devdocsai)! - add fireflies
+
 ## 0.19.1
 
 ### Patch Changes
