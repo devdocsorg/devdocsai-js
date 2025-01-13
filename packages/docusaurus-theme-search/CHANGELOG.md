@@ -1,5 +1,12 @@
 # @devdocsai/docusaurus-theme-search
 
+## 0.14.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @devdocsai/react@0.30.3
+
 ## 0.14.0
 
 ### Minor Changes
