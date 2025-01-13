@@ -34,7 +34,8 @@ export type SourceType =
   | 'file-upload'
   | 'api-upload'
   | 'nango'
-  | 'salesforce';
+  | 'salesforce'
+  | 'fireflies';
 
 export interface Source {
   type: SourceType;
