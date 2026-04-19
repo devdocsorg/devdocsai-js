@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.DEVDOCS_RUNNER || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -29,7 +29,7 @@ jobs:
           DEVDOCSAI_PROJECT_KEY: ${{ secrets.DEVDOCSAI_PROJECT_KEY }}
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.DEVDOCS_RUNNER || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -41,7 +41,7 @@ jobs:
       - uses: codecov/codecov-action@v3
 
   bundle-size:
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.DEVDOCS_RUNNER || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
