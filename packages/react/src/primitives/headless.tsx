@@ -262,6 +262,27 @@ const Prompt = forwardRef<HTMLInputElement, PromptProps>(
 );
 Prompt.displayName = 'DevDocsAI.Prompt';
 
+interface UseCopyToClipboardProps {
+  content: string;
+}
+
+function useCopyToClipboard({ content }: UseCopyToClipboardProps): {
+  didCopy: boolean;
+  handleClick: () => void;
+} {
+  const [didCopy, setDidCopy] = React.useState(false);
+
+  const handleClick = (): void => {
+    navigator.clipboard.writeText(content);
+    setDidCopy(true);
+    setTimeout(() => {
+      setDidCopy(false);
+    }, 2000);
+  };
+
+  return { handleClick, didCopy };
+}
+
 // TODO: find the right type definition for children. There is a mismatch
 // between the type that react-markdown exposes, and what is actually
 // serves.
@@ -271,15 +292,9 @@ interface CopyCodeButtonProps {
 }
 
 function CopyCodeButton(props: CopyCodeButtonProps): ReactElement {
-  const [didCopy, setDidCopy] = React.useState(false);
-
-  const handleClick = (): void => {
-    navigator.clipboard.writeText(props.children[0]?.props.children[0]);
-    setDidCopy(true);
-    setTimeout(() => {
-      setDidCopy(false);
-    }, 2000);
-  };
+  const { handleClick, didCopy } = useCopyToClipboard({
+    content: props.children[0]?.props?.children?.[0] || '',
+  });
 
   return (
     <button
@@ -592,6 +607,8 @@ export {
   SearchResult,
   SearchResults,
   Title,
+  useCopyToClipboard,
+  CopyCodeButton,
   type AnswerProps,
   type AutoScrollerProps,
   type CloseProps,
