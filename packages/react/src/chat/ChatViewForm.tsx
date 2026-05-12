@@ -87,6 +87,13 @@ export function ChatViewForm(props: ChatViewFormProps): ReactElement {
     return () => abortChat.current?.();
   }, [activeView]);
 
+  // Wrap the ref read in a stable callback so RegenerateButton receives a
+  // function rather than the ref value itself — reading abortChat.current
+  // during render trips react-hooks/refs and would also tear the prop on
+  // every render. The callback reads the ref at click time, which is the
+  // intended behaviour.
+  const handleAbortChat = useCallback(() => abortChat.current?.(), []);
+
   return (
     <BaseDevDocsAI.Form className={'DevDocsAIForm'} onSubmit={handleSubmit}>
       <div className="DevDocsAIPromptWrapper">
@@ -119,7 +126,7 @@ export function ChatViewForm(props: ChatViewFormProps): ReactElement {
           <RegenerateButton
             lastMessageState={lastMessageState}
             regenerateLastAnswer={regenerateLastAnswer}
-            abortSubmitChat={abortChat.current}
+            abortSubmitChat={handleAbortChat}
           />
         )}
 

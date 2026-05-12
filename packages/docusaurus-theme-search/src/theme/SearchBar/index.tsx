@@ -6,21 +6,19 @@ import {
   openDevDocsAI,
 } from '@devdocsai/react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import React, { useEffect, type ReactElement, useState } from 'react';
+import React, { type ReactElement, useState } from 'react';
 
 export default function SearchBar(): ReactElement {
+  // Read the window-injected extras once at mount via a lazy useState
+  // initializer; this replaces a useEffect+setState pair that only fired
+  // on mount and tripped react-hooks/set-state-in-effect.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [devdocsaiExtras, setDevDocsAIExtras] = useState<any>({});
-  const { siteConfig } = useDocusaurusContext();
-
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
+  const [devdocsaiExtras] = useState<any>(() => {
+    if (typeof window === 'undefined') return {};
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setDevDocsAIExtras((window as any).devdocsaiConfigExtras || {});
-  }, []);
+    return (window as any).devdocsaiConfigExtras || {};
+  });
+  const { siteConfig } = useDocusaurusContext();
 
   const devdocsaiConfigProps = siteConfig.themeConfig
     .devdocsai as DevDocsAIProps;

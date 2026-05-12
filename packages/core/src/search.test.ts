@@ -144,13 +144,9 @@ describe('submitSearchQuery', () => {
   test('throws an error on invalid status code', async () => {
     status = 500;
 
-    try {
-      await submitSearchQuery('react', 'testKey');
-    } catch (error) {
-      expect((error as Error).message).toBe(
-        'Failed to fetch search results: Internal Server Error',
-      );
-    }
+    await expect(submitSearchQuery('react', 'testKey')).rejects.toThrow(
+      'Failed to fetch search results: Internal Server Error',
+    );
   });
 
   test('throws when an error occurs', async () => {
