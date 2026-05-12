@@ -1423,7 +1423,7 @@
   border-left: 1px solid var(--devdocsai-border);
 }
 
-:first-child(.DevDocsAISearchResultIndented) {
+.DevDocsAISearchResultIndented:first-child {
   padding-top: 1.5rem;
 }
 
