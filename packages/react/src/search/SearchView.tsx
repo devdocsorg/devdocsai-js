@@ -73,31 +73,23 @@ export function SearchView(props: SearchViewProps): ReactElement {
     React.useState<ActiveSearchResult>();
 
   useEffect(() => {
-    // [debug-ci] temporary trace until CI is green; remove after.
-    // eslint-disable-next-line no-console
-    console.log(
-      '[debug-ci] [searchQuery] effect, query=',
-      JSON.stringify(searchQuery),
-    );
+    // if the search query changes, unset the active search result
     setActiveSearchResult(undefined);
   }, [searchQuery]);
 
   useEffect(() => {
-    // [debug-ci] temporary trace until CI is green; remove after.
-    // eslint-disable-next-line no-console
-    console.log(
-      '[debug-ci] [searchResults] effect, len=',
-      searchResults.length,
-    );
+    // When results arrive, default the selection to the first item — but
+    // only if the user doesn't already have one selected. The functional
+    // setState form is critical: under React 19 with fast-resolving
+    // requests (e.g. MSW in tests, or any naturally batched response
+    // sequence), multiple setSearchResults calls can race past `abort()`
+    // and trigger this effect after the user has navigated via keyboard
+    // / hover. Without the `current` check, every stale resolution would
+    // yank the selection back to the first item.
     if (searchResults.length === 0) return;
-    setActiveSearchResult((current) => {
-      // eslint-disable-next-line no-console
-      console.log(
-        '[debug-ci]   [searchResults] setState callback, current=',
-        current?.id,
-      );
-      return current ? current : { id: 'devdocsai-result-0' };
-    });
+    setActiveSearchResult((current) =>
+      current ? current : { id: 'devdocsai-result-0' },
+    );
   }, [searchResults]);
 
   useEffect(() => {
@@ -114,16 +106,6 @@ export function SearchView(props: SearchViewProps): ReactElement {
 
   const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = useCallback(
     (event) => {
-      // [debug-ci] temporary trace until CI is green; remove after.
-      // eslint-disable-next-line no-console
-      console.log(
-        '[debug-ci] handleKeyDown',
-        event.key,
-        'active=',
-        activeSearchResult?.id,
-        'len=',
-        searchResults.length,
-      );
       switch (event.key) {
         case 'ArrowDown': {
           if (!activeSearchResult) return;
@@ -134,11 +116,6 @@ export function SearchView(props: SearchViewProps): ReactElement {
           const nextActiveSearchResultId = activeSearchResult.id?.replace(
             /\d+$/,
             (match) => String(Number(match) + 1),
-          );
-          // eslint-disable-next-line no-console
-          console.log(
-            '[debug-ci] ArrowDown -> setting to',
-            nextActiveSearchResultId,
           );
           setActiveSearchResult({
             id: nextActiveSearchResultId,
