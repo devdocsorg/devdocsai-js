@@ -91,7 +91,16 @@ export function useSearch({
       promise.then((searchResults) => {
         // [debug-ci] temporary trace until CI is green; remove after.
         // eslint-disable-next-line no-console
-        console.log('[debug-ci] useSearch.then aborted=', controller.signal.aborted, 'current?', controllerRef.current === controller, 'query=', JSON.stringify(searchQuery), 'len=', searchResults?.length);
+        console.log(
+          '[debug-ci] useSearch.then aborted=',
+          controller.signal.aborted,
+          'current?',
+          controllerRef.current === controller,
+          'query=',
+          JSON.stringify(searchQuery),
+          'len=',
+          searchResults?.length,
+        );
         if (controller.signal.aborted) return;
         // Discard the response if a newer submitSearchQuery has already
         // replaced our controller. `signal.aborted` alone isn't enough —
@@ -102,7 +111,12 @@ export function useSearch({
         if (!searchResults) return;
 
         // eslint-disable-next-line no-console
-        console.log('[debug-ci] useSearch -> setSearchResults len=', searchResults.length, 'query=', JSON.stringify(searchQuery));
+        console.log(
+          '[debug-ci] useSearch -> setSearchResults len=',
+          searchResults.length,
+          'query=',
+          JSON.stringify(searchQuery),
+        );
         setSearchResults(
           searchResultsToSearchComponentProps(
             searchQuery,

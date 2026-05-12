@@ -75,18 +75,27 @@ export function SearchView(props: SearchViewProps): ReactElement {
   useEffect(() => {
     // [debug-ci] temporary trace until CI is green; remove after.
     // eslint-disable-next-line no-console
-    console.log('[debug-ci] [searchQuery] effect, query=', JSON.stringify(searchQuery));
+    console.log(
+      '[debug-ci] [searchQuery] effect, query=',
+      JSON.stringify(searchQuery),
+    );
     setActiveSearchResult(undefined);
   }, [searchQuery]);
 
   useEffect(() => {
     // [debug-ci] temporary trace until CI is green; remove after.
     // eslint-disable-next-line no-console
-    console.log('[debug-ci] [searchResults] effect, len=', searchResults.length);
+    console.log(
+      '[debug-ci] [searchResults] effect, len=',
+      searchResults.length,
+    );
     if (searchResults.length === 0) return;
     setActiveSearchResult((current) => {
       // eslint-disable-next-line no-console
-      console.log('[debug-ci]   [searchResults] setState callback, current=', current?.id);
+      console.log(
+        '[debug-ci]   [searchResults] setState callback, current=',
+        current?.id,
+      );
       return current ? current : { id: 'devdocsai-result-0' };
     });
   }, [searchResults]);
@@ -107,7 +116,14 @@ export function SearchView(props: SearchViewProps): ReactElement {
     (event) => {
       // [debug-ci] temporary trace until CI is green; remove after.
       // eslint-disable-next-line no-console
-      console.log('[debug-ci] handleKeyDown', event.key, 'active=', activeSearchResult?.id, 'len=', searchResults.length);
+      console.log(
+        '[debug-ci] handleKeyDown',
+        event.key,
+        'active=',
+        activeSearchResult?.id,
+        'len=',
+        searchResults.length,
+      );
       switch (event.key) {
         case 'ArrowDown': {
           if (!activeSearchResult) return;
@@ -120,7 +136,10 @@ export function SearchView(props: SearchViewProps): ReactElement {
             (match) => String(Number(match) + 1),
           );
           // eslint-disable-next-line no-console
-          console.log('[debug-ci] ArrowDown -> setting to', nextActiveSearchResultId);
+          console.log(
+            '[debug-ci] ArrowDown -> setting to',
+            nextActiveSearchResultId,
+          );
           setActiveSearchResult({
             id: nextActiveSearchResultId,
             trigger: 'keyboard',
