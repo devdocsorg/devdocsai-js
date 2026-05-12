@@ -1,6 +1,6 @@
 {
   "name": "@devdocsai/react",
-  "version": "0.30.3",
+  "version": "1.0.0",
   "description": "A headless React component for adding GPT-4 powered search using the DevDocs.ai API.",
   "repository": {
     "type": "git",
