@@ -14,3 +14,5 @@ Also bumps:
 - `@testing-library/react` 12 → 16 (dev dep)
 - `@testing-library/dom` 8 → 10 (dev dep)
 - Drops `@testing-library/react-hooks` (deprecated; its `renderHook` was merged into `@testing-library/react` in v13).
+
+Race-condition fix in `useSearch` / `SearchView`: a fast-resolving stale search response no longer overwrites the user's keyboard selection. Behavioural detail worth knowing for hosts that style the active result — when the search query changes, the selection now reliably resets to the first result of the new result set rather than transiently appearing cleared until the user navigates. In the previous code this only worked when the second response happened to come back empty (a race-timing artefact), which is exactly what the fix removes; the production intent — "fresh query → first result selected" — is now deterministic.
