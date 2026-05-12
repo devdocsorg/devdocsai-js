@@ -78,10 +78,18 @@ export function SearchView(props: SearchViewProps): ReactElement {
   }, [searchQuery]);
 
   useEffect(() => {
-    // if the search results change, set the active search result to the
-    // first result
+    // When results arrive, default the selection to the first item — but
+    // only if the user doesn't already have one selected. The functional
+    // setState form is critical: under React 19 with fast-resolving
+    // requests (e.g. MSW in tests, or any naturally batched response
+    // sequence), multiple setSearchResults calls can race past `abort()`
+    // and trigger this effect after the user has navigated via keyboard
+    // / hover. Without the `current` check, every stale resolution would
+    // yank the selection back to the first item.
     if (searchResults.length === 0) return;
-    setActiveSearchResult({ id: 'devdocsai-result-0' });
+    setActiveSearchResult((current) =>
+      current ? current : { id: 'devdocsai-result-0' },
+    );
   }, [searchResults]);
 
   useEffect(() => {
