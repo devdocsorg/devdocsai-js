@@ -4,7 +4,6 @@ import {
   type SearchResult,
 } from '@devdocsai/core';
 import { render, screen, waitFor } from '@testing-library/react';
-import { suppressErrorOutput } from '@testing-library/react-hooks';
 import { userEvent } from '@testing-library/user-event';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
@@ -19,6 +18,7 @@ import {
   vi,
 } from 'vitest';
 
+import { suppressErrorOutput } from '../test-utils.js';
 import { SearchView } from './SearchView.js';
 
 let status = 200;

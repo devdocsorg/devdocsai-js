@@ -2,7 +2,7 @@ import * as AccessibleIcon from '@radix-ui/react-accessible-icon';
 import * as Tabs from '@radix-ui/react-tabs';
 import { clsx } from 'clsx';
 import Emittery from 'emittery';
-import React, { useEffect, useState, type ReactElement } from 'react';
+import React, { useEffect, useState, type JSX, type ReactElement } from 'react';
 
 import { ChatView } from './chat/ChatView.js';
 import { DEFAULT_DEVDOCSAI_OPTIONS } from './constants.js';

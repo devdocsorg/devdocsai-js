@@ -4,7 +4,6 @@ import {
   type AlgoliaDocSearchHit,
 } from '@devdocsai/core';
 import { waitFor } from '@testing-library/react';
-import { renderHook, act } from '@testing-library/react-hooks';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import {
@@ -17,6 +16,7 @@ import {
   vi,
 } from 'vitest';
 
+import { act, renderHook } from '../test-utils.js';
 import { type UseSearchResult, useSearch } from './useSearch.js';
 
 let searchResults: SearchResult[] | AlgoliaDocSearchHit[] = [];

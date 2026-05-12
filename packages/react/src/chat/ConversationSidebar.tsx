@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 
 import { selectProjectConversations, useChatStore } from './store.js';
 import { PlusIcon } from '../icons.js';

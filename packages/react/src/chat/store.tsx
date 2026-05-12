@@ -9,6 +9,7 @@ import React, {
   createContext,
   useContext,
   useRef,
+  type JSX,
   type ReactNode,
   useEffect,
 } from 'react';
@@ -408,7 +409,7 @@ interface ChatProviderProps {
 export function ChatProvider(props: ChatProviderProps): JSX.Element {
   const { chatOptions, children, debug, projectKey } = props;
 
-  const store = useRef<ChatStore>();
+  const store = useRef<ChatStore | undefined>(undefined);
 
   if (!store.current) {
     store.current = createChatStore({

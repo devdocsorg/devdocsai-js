@@ -1,12 +1,12 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, type RefObject } from 'react';
 
 interface useAbortControllerResult {
-  ref: React.MutableRefObject<AbortController | undefined>;
+  ref: RefObject<AbortController | undefined>;
   abort: () => void;
 }
 
 export function useAbortController(): useAbortControllerResult {
-  const ref = useRef<AbortController>();
+  const ref = useRef<AbortController | undefined>(undefined);
 
   const abort = useCallback(() => {
     if (ref.current) {

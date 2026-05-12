@@ -1,10 +1,5 @@
 import { DEFAULT_SUBMIT_CHAT_OPTIONS } from '@devdocsai/core';
 import { waitFor } from '@testing-library/react';
-import {
-  act,
-  renderHook,
-  suppressErrorOutput,
-} from '@testing-library/react-hooks';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import {
@@ -17,6 +12,7 @@ import {
   vi,
 } from 'vitest';
 
+import { act, renderHook, suppressErrorOutput } from '../test-utils.js';
 import { type UsePromptResult, usePrompt } from './usePrompt.js';
 
 const encoder = new TextEncoder();
