@@ -35,7 +35,7 @@
     "mdast-util-from-markdown": "^2.0.0",
     "mdast-util-to-string": "^4.0.0",
     "p-debounce": "^4.0.0",
-    "react-markdown": "^8.0.7",
+    "react-markdown": "^9.0.0",
     "react-merge-refs": "^2.0.2",
     "remark-gfm": "^3.0.1",
     "zustand": "^4.4.1"
@@ -49,8 +49,8 @@
     "@types/lodash": "^4.14.199"
   },
   "peerDependencies": {
-    "react": "^16 || ^17 || ^18",
-    "react-dom": "^16 || ^17 || ^18"
+    "react": "^16 || ^17 || ^18 || ^19",
+    "react-dom": "^16 || ^17 || ^18 || ^19"
   },
   "publishConfig": {
     "access": "public"
