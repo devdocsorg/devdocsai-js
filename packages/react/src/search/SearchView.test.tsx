@@ -222,9 +222,10 @@ describe('SearchView', () => {
     // setSearchResults render — `waitFor(getByRole link 'Untitled')`
     // above returns before that effect has committed.
     await waitFor(() =>
-      expect(
-        screen.getByRole('option', { selected: true }),
-      ).toHaveAttribute('id', 'devdocsai-result-0'),
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-0',
+      ),
     );
 
     // After the form-submit Enter via `user.keyboard('{Enter}')`, userEvent
@@ -240,27 +241,30 @@ describe('SearchView', () => {
     fireEvent.keyDown(searchbox, { key: 'ArrowDown' });
 
     await waitFor(() =>
-      expect(
-        screen.getByRole('option', { selected: true }),
-      ).toHaveAttribute('id', 'devdocsai-result-1'),
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-1',
+      ),
     );
 
     // select item on mousemove
     await userEvent.hover(screen.getByRole('link', { name: 'result 2' }));
 
     await waitFor(() =>
-      expect(
-        screen.getByRole('option', { selected: true }),
-      ).toHaveAttribute('id', 'devdocsai-result-2'),
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-2',
+      ),
     );
 
     // select previous on arrow up
     fireEvent.keyDown(searchbox, { key: 'ArrowUp' });
 
     await waitFor(() =>
-      expect(
-        screen.getByRole('option', { selected: true }),
-      ).toHaveAttribute('id', 'devdocsai-result-1'),
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-1',
+      ),
     );
 
     // don't go past the last result
@@ -269,9 +273,10 @@ describe('SearchView', () => {
     fireEvent.keyDown(searchbox, { key: 'ArrowDown' });
 
     await waitFor(() =>
-      expect(
-        screen.getByRole('option', { selected: true }),
-      ).toHaveAttribute('id', 'devdocsai-result-2'),
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-2',
+      ),
     );
   });
 
@@ -308,17 +313,19 @@ describe('SearchView', () => {
     // Default selection lands via a useEffect after the link renders, so
     // poll for it.
     await waitFor(() =>
-      expect(
-        screen.getByRole('option', { selected: true }),
-      ).toHaveAttribute('id', 'devdocsai-result-0'),
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-0',
+      ),
     );
 
     // Navigate down so the active selection is no longer the first item.
     fireEvent.keyDown(screen.getByRole('searchbox'), { key: 'ArrowDown' });
     await waitFor(() =>
-      expect(
-        screen.getByRole('option', { selected: true }),
-      ).toHaveAttribute('id', 'devdocsai-result-1'),
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-1',
+      ),
     );
 
     // Change the search query (append more typing). The selection should
@@ -326,9 +333,10 @@ describe('SearchView', () => {
     await user.type(screen.getByRole('searchbox'), query);
 
     await waitFor(() =>
-      expect(
-        screen.getByRole('option', { selected: true }),
-      ).toHaveAttribute('id', 'devdocsai-result-0'),
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-0',
+      ),
     );
   });
 
@@ -358,9 +366,10 @@ describe('SearchView', () => {
     // before firing Enter — otherwise handleKeyDown's `if (!activeSearchResult)
     // return` short-circuits.
     await waitFor(() =>
-      expect(
-        screen.getByRole('option', { selected: true }),
-      ).toHaveAttribute('id', 'devdocsai-result-0'),
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-0',
+      ),
     );
 
     // See `select search queries` for why we dispatch via fireEvent here
