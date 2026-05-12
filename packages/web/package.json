@@ -28,7 +28,7 @@
     "prepack": "node scripts/build.js"
   },
   "dependencies": {
-    "@devdocsai/core": "0.20.0",
+    "@devdocsai/core": "0.21.0",
     "@devdocsai/react": "1.0.0"
   },
   "devDependencies": {
