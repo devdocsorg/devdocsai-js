@@ -90,6 +90,12 @@ export function useSearch({
       }
       promise.then((searchResults) => {
         if (controller.signal.aborted) return;
+        // Discard the response if a newer submitSearchQuery has already
+        // replaced our controller. `signal.aborted` alone isn't enough —
+        // when fetch resolves synchronously (e.g. MSW in tests), the next
+        // keystroke's `abort()` hasn't run yet, so this `.then` would
+        // overwrite the latest results with stale ones.
+        if (controllerRef.current !== controller) return;
         if (!searchResults) return;
 
         setSearchResults(

@@ -1,10 +1,10 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
-import { suppressErrorOutput } from '@testing-library/react-hooks';
 import { userEvent } from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { DevDocsAI, closeDevDocsAI, openDevDocsAI } from './index.js';
+import { suppressErrorOutput } from './test-utils.js';
 
 describe('DevDocsAI', () => {
   it('renders', async () => {

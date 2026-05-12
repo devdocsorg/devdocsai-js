@@ -1,10 +1,10 @@
 import { DEFAULT_SUBMIT_FEEDBACK_OPTIONS } from '@devdocsai/core';
 import { waitFor } from '@testing-library/react';
-import { renderHook, suppressErrorOutput } from '@testing-library/react-hooks';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
+import { renderHook, suppressErrorOutput } from '../test-utils.js';
 import { useFeedback } from './useFeedback.js';
 
 let status = 200;

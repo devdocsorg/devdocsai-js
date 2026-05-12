@@ -78,10 +78,18 @@ export function SearchView(props: SearchViewProps): ReactElement {
   }, [searchQuery]);
 
   useEffect(() => {
-    // if the search results change, set the active search result to the
-    // first result
+    // When results arrive, default the selection to the first item — but
+    // only if the user doesn't already have one selected. The functional
+    // setState form is critical: under React 19 with fast-resolving
+    // requests (e.g. MSW in tests, or any naturally batched response
+    // sequence), multiple setSearchResults calls can race past `abort()`
+    // and trigger this effect after the user has navigated via keyboard
+    // / hover. Without the `current` check, every stale resolution would
+    // yank the selection back to the first item.
     if (searchResults.length === 0) return;
-    setActiveSearchResult({ id: 'devdocsai-result-0' });
+    setActiveSearchResult((current) =>
+      current ? current : { id: 'devdocsai-result-0' },
+    );
   }, [searchResults]);
 
   useEffect(() => {
@@ -233,16 +241,20 @@ function SearchResultsContainer(
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent): void => {
-      if (event.key === 'ArrowDown') {
-        if (searchResults.length > 0 && activeSearchResult === undefined) {
-          setActiveSearchResult({
-            id: 'devdocsai-result-0',
-            trigger: 'keyboard',
-          });
-          const el = document.querySelector(`#${searchInputName}`);
-          if (el instanceof HTMLInputElement) el.focus();
-        }
-      }
+      if (event.key !== 'ArrowDown') return;
+      if (searchResults.length === 0) return;
+      // Use functional setState so the check reads the CURRENT
+      // activeSearchResult rather than a stale closure value. Without
+      // this, a stale `undefined` snapshot from a previous effect run
+      // could fire setActiveSearchResult after the SearchView's React
+      // onKeyDown has already advanced the selection, snapping it back
+      // to the first result.
+      setActiveSearchResult((current) => {
+        if (current !== undefined) return current;
+        const el = document.querySelector(`#${searchInputName}`);
+        if (el instanceof HTMLInputElement) el.focus();
+        return { id: 'devdocsai-result-0', trigger: 'keyboard' };
+      });
     };
 
     document.addEventListener('keydown', handleKeyDown);
@@ -250,7 +262,7 @@ function SearchResultsContainer(
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [activeSearchResult, searchResults, setActiveSearchResult]);
+  }, [searchResults, setActiveSearchResult]);
 
   useEffect(() => {
     // Do not scroll into view unless using keyboard navigation.

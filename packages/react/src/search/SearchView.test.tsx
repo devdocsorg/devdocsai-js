@@ -3,8 +3,7 @@ import {
   type AlgoliaDocSearchHit,
   type SearchResult,
 } from '@devdocsai/core';
-import { render, screen, waitFor } from '@testing-library/react';
-import { suppressErrorOutput } from '@testing-library/react-hooks';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
@@ -19,6 +18,7 @@ import {
   vi,
 } from 'vitest';
 
+import { suppressErrorOutput } from '../test-utils.js';
 import { SearchView } from './SearchView.js';
 
 let status = 200;
@@ -217,40 +217,67 @@ describe('SearchView', () => {
       ).toBeInTheDocument();
     });
 
-    // first item selected by default
-    await expect(
-      screen.getByRole('option', { selected: true }),
-    ).toHaveAttribute('id', 'devdocsai-result-0');
+    // first item selected by default. Wrapped in waitFor because the
+    // initial selection lands via a useEffect that fires AFTER the
+    // setSearchResults render — `waitFor(getByRole link 'Untitled')`
+    // above returns before that effect has committed.
+    await waitFor(() =>
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-0',
+      ),
+    );
+
+    // After the form-submit Enter via `user.keyboard('{Enter}')`, userEvent
+    // v14 no longer tracks the input as the active typing target — its
+    // internal pointer state is invalidated by the synthetic submit even
+    // though document.activeElement is still the input. Subsequent
+    // `user.keyboard()` calls become no-ops. We're testing the SearchView's
+    // own keydown handler, not user-event's pointer tracking, so dispatch
+    // arrow / non-submit-Enter events directly on the input via fireEvent.
+    const searchbox = screen.getByRole('searchbox');
 
     // select item on arrow down
-    await user.keyboard('{ArrowDown}');
+    fireEvent.keyDown(searchbox, { key: 'ArrowDown' });
 
-    await expect(
-      screen.getByRole('option', { selected: true }),
-    ).toHaveAttribute('id', 'devdocsai-result-1');
+    await waitFor(() =>
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-1',
+      ),
+    );
 
     // select item on mousemove
     await userEvent.hover(screen.getByRole('link', { name: 'result 2' }));
 
-    await expect(
-      screen.getByRole('option', { selected: true }),
-    ).toHaveAttribute('id', 'devdocsai-result-2');
+    await waitFor(() =>
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-2',
+      ),
+    );
 
     // select previous on arrow up
-    await user.keyboard('{ArrowUp}');
+    fireEvent.keyDown(searchbox, { key: 'ArrowUp' });
 
-    await expect(
-      screen.getByRole('option', { selected: true }),
-    ).toHaveAttribute('id', 'devdocsai-result-1');
+    await waitFor(() =>
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-1',
+      ),
+    );
 
     // don't go past the last result
-    await user.keyboard('{ArrowDown}');
-    await user.keyboard('{ArrowDown}');
-    await user.keyboard('{ArrowDown}');
+    fireEvent.keyDown(searchbox, { key: 'ArrowDown' });
+    fireEvent.keyDown(searchbox, { key: 'ArrowDown' });
+    fireEvent.keyDown(searchbox, { key: 'ArrowDown' });
 
-    await expect(
-      screen.getByRole('option', { selected: true }),
-    ).toHaveAttribute('id', 'devdocsai-result-2');
+    await waitFor(() =>
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-2',
+      ),
+    );
   });
 
   it('reselects the first search result when the search query changes', async () => {
@@ -260,6 +287,14 @@ describe('SearchView', () => {
     results = [
       {
         file: { path: 'path/to/file', source: { type: 'github' } },
+        matchType: 'title',
+      },
+      {
+        file: {
+          path: 'path/to/file',
+          title: 'result 1',
+          source: { type: 'github' },
+        },
         matchType: 'title',
       },
     ];
@@ -275,17 +310,34 @@ describe('SearchView', () => {
       ).toBeInTheDocument();
     });
 
+    // Default selection lands via a useEffect after the link renders, so
+    // poll for it.
+    await waitFor(() =>
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-0',
+      ),
+    );
+
+    // Navigate down so the active selection is no longer the first item.
+    fireEvent.keyDown(screen.getByRole('searchbox'), { key: 'ArrowDown' });
+    await waitFor(() =>
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-1',
+      ),
+    );
+
+    // Change the search query (append more typing). The selection should
+    // reset back to the first result for the new query.
     await user.type(screen.getByRole('searchbox'), query);
 
-    await waitFor(() => {
-      expect(
-        screen.queryByRole('option', { selected: true }),
-      ).not.toBeInTheDocument();
-    });
-
-    await user.keyboard('{ArrowDown}');
-
-    expect(screen.getByRole('option', { selected: true })).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-0',
+      ),
+    );
   });
 
   it('allows users to open search results', async () => {
@@ -310,9 +362,21 @@ describe('SearchView', () => {
       ).toBeInTheDocument();
     });
 
-    await user.keyboard('{Enter}');
+    // Wait for the default selection to land via the post-results effect
+    // before firing Enter — otherwise handleKeyDown's `if (!activeSearchResult)
+    // return` short-circuits.
+    await waitFor(() =>
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-0',
+      ),
+    );
 
-    await expect(window.location.href).toContain('#file');
+    // See `select search queries` for why we dispatch via fireEvent here
+    // instead of `user.keyboard`.
+    fireEvent.keyDown(screen.getByRole('searchbox'), { key: 'Enter' });
+
+    await waitFor(() => expect(window.location.href).toContain('#file'));
   });
 
   it('highlights matches', async () => {
