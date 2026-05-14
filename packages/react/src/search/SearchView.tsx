@@ -72,25 +72,32 @@ export function SearchView(props: SearchViewProps): ReactElement {
   const [activeSearchResult, setActiveSearchResult] =
     React.useState<ActiveSearchResult>();
 
-  useEffect(() => {
-    // if the search query changes, unset the active search result
+  // Adjust selection synchronously during render in response to upstream
+  // changes — React's documented "adjusting state when a prop changes"
+  // pattern. Replaces a pair of useEffects (one cleared on query change,
+  // one defaulted to result-0 on new results) that the React Compiler
+  // rule flags as cascading commits. The functional setState in the
+  // results branch is critical: under React 19 with fast-resolving
+  // requests (e.g. MSW in tests, or any naturally batched response
+  // sequence), multiple setSearchResults calls can race past `abort()`
+  // and trigger this branch after the user has navigated via keyboard
+  // / hover. Without the `current` check, every stale resolution would
+  // yank the selection back to the first item.
+  const [prevSearchQuery, setPrevSearchQuery] = React.useState(searchQuery);
+  const [prevSearchResults, setPrevSearchResults] =
+    React.useState(searchResults);
+  if (prevSearchQuery !== searchQuery) {
+    setPrevSearchQuery(searchQuery);
     setActiveSearchResult(undefined);
-  }, [searchQuery]);
-
-  useEffect(() => {
-    // When results arrive, default the selection to the first item — but
-    // only if the user doesn't already have one selected. The functional
-    // setState form is critical: under React 19 with fast-resolving
-    // requests (e.g. MSW in tests, or any naturally batched response
-    // sequence), multiple setSearchResults calls can race past `abort()`
-    // and trigger this effect after the user has navigated via keyboard
-    // / hover. Without the `current` check, every stale resolution would
-    // yank the selection back to the first item.
-    if (searchResults.length === 0) return;
-    setActiveSearchResult((current) =>
-      current ? current : { id: 'devdocsai-result-0' },
-    );
-  }, [searchResults]);
+  }
+  if (prevSearchResults !== searchResults) {
+    setPrevSearchResults(searchResults);
+    if (searchResults.length > 0) {
+      setActiveSearchResult((current) =>
+        current ? current : { id: 'devdocsai-result-0' },
+      );
+    }
+  }
 
   useEffect(() => {
     // Bring form input in focus when activeView changes.

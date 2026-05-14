@@ -9,7 +9,7 @@ import {
   type SubmitSearchQueryOptions,
 } from '@devdocsai/core';
 import debounce from 'p-debounce';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { DEFAULT_DEVDOCSAI_OPTIONS } from '../constants.js';
 import type { DevDocsAIOptions, SearchResultComponentProps } from '../types.js';
@@ -128,12 +128,28 @@ export function useSearch({
     [searchOptions, abort, controllerRef, projectKey, debug],
   );
 
+  // Memoize the debounced wrapper so it survives across renders. Calling
+  // `debounce(submitSearchQuery, 220)` inline rebuilt the closure on every
+  // render — defeating the debounce — and also tripped react-hooks/refs
+  // because submitSearchQuery closes over controllerRef. With useMemo the
+  // debounced function is read from cache during render rather than
+  // freshly constructed against the ref.
+  const debouncedSubmitSearchQuery = useMemo(
+    // debounce stores the reference and only invokes it after the timeout
+    // fires — the ref read happens in that deferred call (an event-handler-
+    // adjacent context), not during render. The rule's static analysis
+    // can't see past the function boundary, so disable here with intent.
+    // eslint-disable-next-line react-hooks/refs
+    () => debounce(submitSearchQuery, 220),
+    [submitSearchQuery],
+  );
+
   return {
     state,
     searchResults,
     searchQuery,
     setSearchQuery,
-    submitSearchQuery: debounce(submitSearchQuery, 220),
+    submitSearchQuery: debouncedSubmitSearchQuery,
     abort,
   };
 }
