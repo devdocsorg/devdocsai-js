@@ -1,0 +1,9 @@
+# SOC 2 CC6.1 / CC8.1: SDK, release, and CI changes require review from
+# the DevDocs production admin group before merge.
+* @devdocsorg/prod-admins
+
+/.github/ @devdocsorg/prod-admins
+/packages/ @devdocsorg/prod-admins
+/examples/ @devdocsorg/prod-admins
+/package.json @devdocsorg/prod-admins
+/package-lock.json @devdocsorg/prod-admins

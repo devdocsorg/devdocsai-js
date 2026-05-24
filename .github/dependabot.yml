@@ -1,0 +1,44 @@
+# SOC 2 CC7.1 / CC8.1 dependency change evidence.
+
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: America/Chicago
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+    commit-message:
+      prefix: chore(deps)
+      include: scope
+    groups:
+      production-deps:
+        applies-to: version-updates
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+      development-deps:
+        applies-to: version-updates
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:15'
+      timezone: America/Chicago
+    labels:
+      - dependencies
+      - github-actions
+    commit-message:
+      prefix: chore(actions)
+      include: scope
