@@ -50,6 +50,11 @@ and some example implementations:
 To use the DevDocs.ai platform as is, please refer to the
 [DevDocs.ai documentation](https://devdocs.ai/docs).
 
+## Compliance
+
+The package release controls for SOC 2 SEC-004 are documented in
+[Package Security and Provenance Baseline](docs/compliance/package-security-provenance.md).
+
 ## Authors
 
 This library is created by the team behind [DevDocs.ai](https://devdocs.ai)
