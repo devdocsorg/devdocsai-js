@@ -1,0 +1,25 @@
+packages:
+  - 'examples/*'
+  - 'packages/*'
+
+# Use a flat (npm-like) node_modules layout. The previous npm workspace relied
+# on hoisting so packages could resolve transitive types; under pnpm's default
+# isolated store, `tsc --build` emits unportable `.pnpm/...` paths for inferred
+# types (e.g. immer via zustand -> TS2742). Hoisting restores the prior behavior.
+nodeLinker: hoisted
+
+# These dependencies have install/postinstall build scripts that must run for
+# the toolchain to work (esbuild/@swc binaries, sharp native, msw worker, etc.).
+# pnpm 11 blocks unapproved build scripts with ERR_PNPM_IGNORED_BUILDS, which
+# fails `pnpm install --frozen-lockfile` on a cold CI runner. `onlyBuiltDependencies`
+# alone does NOT clear that hard error in pnpm 11.0.9, so we also opt these builds
+# in explicitly so CI installs run them non-interactively. (DEV phase0 / PR #16)
+onlyBuiltDependencies:
+  - '@swc/core'
+  - core-js
+  - esbuild
+  - msw
+  - sharp
+  - unrs-resolver
+
+dangerouslyAllowAllBuilds: true

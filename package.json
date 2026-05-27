@@ -1,23 +1,23 @@
 {
   "name": "devdocsai",
   "private": true,
-  "workspaces": [
-    "examples/*",
-    "packages/*"
-  ],
+  "packageManager": "pnpm@11.0.9",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
-    "build": "npm pack --workspaces",
-    "build:packages": "npm run build -w @devdocsai/core -w @devdocsai/docusaurus-theme-search -w @devdocsai/react -w @devdocsai/web",
+    "build": "pnpm -r pack",
+    "build:packages": "pnpm --filter @devdocsai/core --filter @devdocsai/docusaurus-theme-search --filter @devdocsai/react --filter @devdocsai/web run build",
     "lint": "run-p lint:css lint:format lint:js lint:md lint:ts",
     "lint:css": "npx stylelint \"**/*.css\"",
     "lint:format": "prettier --check .",
     "lint:js": "eslint . --quiet",
     "lint:md": "remark . --frail",
-    "lint:ts": "npm run build && rm *.tgz",
+    "lint:ts": "pnpm run build && rm -f packages/*/*.tgz examples/*/*.tgz",
     "prepare": "husky install",
-    "publish": "npm run build:packages && changeset publish",
+    "publish": "pnpm run build:packages && changeset publish",
     "test": "vitest run --coverage",
-    "version": "changeset version && npm install"
+    "version": "changeset version && pnpm install"
   },
   "dependencies": {
     "@changesets/changelog-github": "^0.4.8",

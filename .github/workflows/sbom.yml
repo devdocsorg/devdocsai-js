@@ -10,7 +10,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Generate CycloneDX SBOM
-        run: npx --yes @cyclonedx/cyclonedx-npm@latest --output-file sbom.json --package-lock-only
+      - name: Generate CycloneDX SBOM (pnpm lockfile)
+        run: npx --yes @cyclonedx/cdxgen@latest -t pnpm -o sbom.json --no-recurse
       - uses: actions/upload-artifact@v4
         with: { name: sbom, path: sbom.json }
