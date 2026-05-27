@@ -1,0 +1,20 @@
+# Universal CI — DEV profile. Calls devdocsorg/ci-workflows/.github/workflows/reusable-node-ci.yml@v1. Additive; mapped to this repo's scripts. DEV-872.
+name: Universal CI
+on:
+  pull_request:
+  push: { branches: [main] }
+concurrency: { group: uci-${{ github.workflow }}-${{ github.ref }}, cancel-in-progress: false }
+permissions: { contents: read }
+jobs:
+  lint:
+    uses: devdocsorg/ci-workflows/.github/workflows/reusable-node-ci.yml@v1
+    with: { job-name: lint, command: npm run lint, package-manager: npm }
+    secrets: inherit
+  build:
+    uses: devdocsorg/ci-workflows/.github/workflows/reusable-node-ci.yml@v1
+    with: { job-name: build, command: npm run build, package-manager: npm, runner-tier: heavy }
+    secrets: inherit
+  test:
+    uses: devdocsorg/ci-workflows/.github/workflows/reusable-node-ci.yml@v1
+    with: { job-name: test, command: npm run test, package-manager: npm }
+    secrets: inherit
