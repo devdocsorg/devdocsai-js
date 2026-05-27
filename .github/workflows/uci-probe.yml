@@ -1,0 +1,13 @@
+# Probe: isolate whether 0-jobs is the reusable `uses:` ref or the repo itself.
+name: UCI Probe
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ${{ vars.DEVDOCS_RUNNER || 'ubuntu-latest' }}
+    steps:
+      - run: echo "probe dispatched ok"
