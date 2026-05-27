@@ -2,7 +2,7 @@ import {
   DEFAULT_SUBMIT_SEARCH_QUERY_OPTIONS,
   type SearchResult,
 } from '@devdocsai/core';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
@@ -45,6 +45,11 @@ afterEach(() => {
   searchResults = [];
   status = 200;
   server.resetHandlers();
+  // Drop any per-test navigator.clipboard mock so it cannot leak.
+  if (Object.getOwnPropertyDescriptor(navigator, 'clipboard')?.configurable) {
+    // @ts-expect-error allow deleting the configurable test-only property
+    delete navigator.clipboard;
+  }
 });
 
 test('Initial state', async () => {
@@ -330,4 +335,65 @@ test('References renders the passed ReferenceComponent', () => {
     />,
   );
   expect(ReferenceComponent).toHaveBeenCalledOnce();
+});
+
+function mockClipboard(): ReturnType<typeof vi.fn> {
+  const writeText = vi.fn().mockResolvedValue(undefined);
+  // jsdom does not implement navigator.clipboard; define it directly rather
+  // than stubbing the whole navigator global (which breaks userEvent).
+  Object.defineProperty(navigator, 'clipboard', {
+    configurable: true,
+    value: { writeText },
+  });
+  return writeText;
+}
+
+test('CopyCodeButton copies a plain-string answer to the clipboard', () => {
+  const writeText = mockClipboard();
+
+  // PromptView passes the rendered answer as a plain string child. Previously
+  // CopyCodeButton read children[0] (the first character) so this copied "".
+  render(
+    <DevDocsAI.CopyCodeButton>
+      {'the full answer text'}
+    </DevDocsAI.CopyCodeButton>,
+  );
+
+  fireEvent.click(screen.getByRole('button'));
+
+  expect(writeText).toHaveBeenCalledWith('the full answer text');
+});
+
+test('CopyCodeButton copies text from the markdown code-block shape', () => {
+  const writeText = mockClipboard();
+
+  // react-markdown passes a <code> element tree; the copyable text lives at
+  // children[0].props.children[0]. This shape must keep working.
+  const markdownChildren = [{ props: { children: ['const answer = 42;'] } }];
+  render(
+    <DevDocsAI.CopyCodeButton>{markdownChildren}</DevDocsAI.CopyCodeButton>,
+  );
+
+  fireEvent.click(screen.getByRole('button'));
+
+  expect(writeText).toHaveBeenCalledWith('const answer = 42;');
+});
+
+test('useCopyToClipboard toggles didCopy on click', () => {
+  const writeText = mockClipboard();
+
+  function Harness(): React.ReactElement {
+    const { handleClick, didCopy } = DevDocsAI.useCopyToClipboard({
+      content: 'copied content',
+    });
+    return <button onClick={handleClick}>{didCopy ? 'copied' : 'copy'}</button>;
+  }
+
+  render(<Harness />);
+  expect(screen.getByRole('button')).toHaveTextContent('copy');
+
+  fireEvent.click(screen.getByRole('button'));
+
+  expect(writeText).toHaveBeenCalledWith('copied content');
+  expect(screen.getByRole('button')).toHaveTextContent('copied');
 });

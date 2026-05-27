@@ -291,9 +291,29 @@ interface CopyCodeButtonProps {
   children?: any;
 }
 
+// CopyCodeButton receives children in two shapes:
+//  - a plain string (e.g. the rendered answer text passed by PromptView), or
+//  - the react-markdown code-block element tree, where the copyable text is
+//    nested at children[0].props.children[0].
+// Reading children[0] on a string yields its first character, so the answer-
+// copy path used to copy an empty/single-char value. Normalize both shapes.
+function extractCopyableText(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  children: any,
+): string {
+  if (typeof children === 'string') return children;
+  if (Array.isArray(children)) {
+    const nested = children[0]?.props?.children?.[0];
+    if (typeof nested === 'string') return nested;
+  }
+  const nested = children?.props?.children?.[0];
+  if (typeof nested === 'string') return nested;
+  return '';
+}
+
 function CopyCodeButton(props: CopyCodeButtonProps): ReactElement {
   const { handleClick, didCopy } = useCopyToClipboard({
-    content: props.children[0]?.props?.children?.[0] || '',
+    content: extractCopyableText(props.children),
   });
 
   return (
