@@ -1,4 +1,9 @@
-# Universal CI — DEV profile. Calls the org engine. build/e2e soft until env+browser-deps wired (DEV-873/861). DEV-872.
+# Universal CI — DEV profile. Inlined (not the org reusable workflow) because
+# devdocsai-js is the only PUBLIC repo in the fleet and GitHub denies a public
+# repo access to the PRIVATE devdocsorg/ci-workflows reusable workflow
+# (access_level=organization grants private/internal repos only), which made
+# the caller compile to 0 jobs and fail at 0s. Mirrors reusable-node-ci.yml@v1
+# for npm. build soft until env+browser-deps wired (DEV-873/861). DEV-872.
 name: Universal CI
 on:
   pull_request:
@@ -11,14 +16,78 @@ permissions:
   contents: read
 jobs:
   lint:
-    uses: devdocsorg/ci-workflows/.github/workflows/reusable-node-ci.yml@v1
-    with: { job-name: lint, command: npm run lint, package-manager: npm }
-    secrets: inherit
+    runs-on: ${{ vars.DEVDOCS_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Write CI build env (.env.local)
+        env:
+          CI_DOTENV: ${{ secrets.CI_DOTENV }}
+        shell: bash
+        run: |
+          if [ -n "${CI_DOTENV:-}" ]; then
+            printf '%s\n' "$CI_DOTENV" > .env.local
+            echo "Wrote $(grep -c '=' .env.local) vars to .env.local"
+          else
+            echo "No CI_DOTENV secret set — relying on repo defaults."
+          fi
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm ci
+      - name: lint
+        run: npm run lint
   build:
-    uses: devdocsorg/ci-workflows/.github/workflows/reusable-node-ci.yml@v1
-    with: { job-name: build, command: npm run build, package-manager: npm, runner-tier: heavy, soft-fail: true }
-    secrets: inherit
+    runs-on: ${{ vars.DEVDOCS_HEAVY_RUNNER || 'devdocs-local-heavy' }}
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Write CI build env (.env.local)
+        env:
+          CI_DOTENV: ${{ secrets.CI_DOTENV }}
+        shell: bash
+        run: |
+          if [ -n "${CI_DOTENV:-}" ]; then
+            printf '%s\n' "$CI_DOTENV" > .env.local
+            echo "Wrote $(grep -c '=' .env.local) vars to .env.local"
+          else
+            echo "No CI_DOTENV secret set — relying on repo defaults."
+          fi
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm ci
+      - name: build
+        continue-on-error: true
+        run: npm run build
   test:
-    uses: devdocsorg/ci-workflows/.github/workflows/reusable-node-ci.yml@v1
-    with: { job-name: test, command: npm run test, package-manager: npm }
-    secrets: inherit
+    runs-on: ${{ vars.DEVDOCS_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Write CI build env (.env.local)
+        env:
+          CI_DOTENV: ${{ secrets.CI_DOTENV }}
+        shell: bash
+        run: |
+          if [ -n "${CI_DOTENV:-}" ]; then
+            printf '%s\n' "$CI_DOTENV" > .env.local
+            echo "Wrote $(grep -c '=' .env.local) vars to .env.local"
+          else
+            echo "No CI_DOTENV secret set — relying on repo defaults."
+          fi
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm ci
+      - name: test
+        run: npm run test
