@@ -228,6 +228,23 @@ describe('SearchView', () => {
       ),
     );
 
+    // Let the trailing debounced search (scheduled by `user.type`, 220ms
+    // window) flush and resolve BEFORE we navigate. Typing the query queued
+    // a debounced submit in addition to the immediate Enter submit; if that
+    // late response lands mid-navigation it replaces `searchResults` with a
+    // fresh array and the "adjust selection on new results" branch re-runs,
+    // intermittently yanking the selection back (a timing-dependent flake).
+    // Waiting past the debounce window and then flushing pending microtasks
+    // drains that late response while the default result-0 selection is
+    // still active, making the keyboard / hover assertions deterministic.
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await waitFor(() =>
+      expect(screen.getByRole('option', { selected: true })).toHaveAttribute(
+        'id',
+        'devdocsai-result-0',
+      ),
+    );
+
     // After the form-submit Enter via `user.keyboard('{Enter}')`, userEvent
     // v14 no longer tracks the input as the active typing target — its
     // internal pointer state is invalidated by the synthetic submit even
