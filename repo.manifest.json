@@ -1,0 +1,8 @@
+{
+  "repo": "devdocsai-js",
+  "target": "packages/js-sdk",
+  "type": "package",
+  "standards": { "packageManager": "pnpm", "node": "24", "framework": "n/a (library; @devdocsai/react peers React 19)" },
+  "promotionOrder": "1-leaf",
+  "status": "phase0-baseline-applied; pnpm + Node24 build migration pending (see MONOREPO-PREP.md)"
+}
