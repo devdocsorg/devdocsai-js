@@ -22,4 +22,3 @@ jobs:
     uses: devdocsorg/ci-workflows/.github/workflows/reusable-node-ci.yml@v1
     with: { job-name: test, command: npm run test, package-manager: npm }
     secrets: inherit
-# retrigger DEV-872
