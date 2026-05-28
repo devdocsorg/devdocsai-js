@@ -362,4 +362,141 @@ describe('submitChat', () => {
       mockFetch.mockRestore();
     }
   });
+
+  test('logs debugInfo to the console when the positional debug arg is set', async () => {
+    const debugSpy = vi
+      .spyOn(console, 'debug')
+      .mockImplementation(() => undefined);
+    // The streamed body must be valid JSON so res.clone().json() can read it.
+    response = [JSON.stringify({ debugInfo: { tokens: 7 } })];
+
+    try {
+      await submitChat(
+        [{ content: 'How much is 1+2?', role: 'user' }],
+        'testKey',
+        onAnswerChunk,
+        onReferences,
+        onConversationId,
+        onPromptId,
+        onError,
+        {},
+        true, // positional debug
+      );
+
+      expect(debugSpy).toHaveBeenCalledWith({ tokens: 7 });
+      expect(onError).not.toHaveBeenCalled();
+    } finally {
+      debugSpy.mockRestore();
+    }
+  });
+
+  test('logs debugInfo when options.debug is set (documented option honored)', async () => {
+    // Regression test for the previously-dead `SubmitChatOptions.debug` option:
+    // it MUST trigger client-side debug logging just like the positional arg.
+    const debugSpy = vi
+      .spyOn(console, 'debug')
+      .mockImplementation(() => undefined);
+    response = [JSON.stringify({ debugInfo: { source: 'options' } })];
+
+    try {
+      await submitChat(
+        [{ content: 'How much is 1+2?', role: 'user' }],
+        'testKey',
+        onAnswerChunk,
+        onReferences,
+        onConversationId,
+        onPromptId,
+        onError,
+        { debug: true }, // documented option, no positional arg
+      );
+
+      expect(debugSpy).toHaveBeenCalledWith({ source: 'options' });
+    } finally {
+      debugSpy.mockRestore();
+    }
+  });
+
+  test('does NOT log debugInfo when neither debug flag is set', async () => {
+    // Mutation guard: ensures the assertions above are not vacuously passing —
+    // with debug off, console.debug must not be called even when debugInfo is
+    // present in the response body.
+    const debugSpy = vi
+      .spyOn(console, 'debug')
+      .mockImplementation(() => undefined);
+    response = [JSON.stringify({ debugInfo: { tokens: 7 } })];
+
+    try {
+      await submitChat(
+        [{ content: 'How much is 1+2?', role: 'user' }],
+        'testKey',
+        onAnswerChunk,
+        onReferences,
+        onConversationId,
+        onPromptId,
+        onError,
+        {},
+      );
+
+      expect(debugSpy).not.toHaveBeenCalled();
+    } finally {
+      debugSpy.mockRestore();
+    }
+  });
+
+  test('logs the error body to console.error when options.debug is set on a failed request', async () => {
+    // The error-path debug log must also honor the documented option.
+    const errorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+    status = 500;
+    response = ['Internal Server Error'];
+
+    try {
+      await submitChat(
+        [{ content: 'How much is 1+2?', role: 'user' }],
+        'testKey',
+        onAnswerChunk,
+        onReferences,
+        onConversationId,
+        onPromptId,
+        onError,
+        { debug: true },
+      );
+
+      expect(errorSpy).toHaveBeenCalledWith('Internal Server Error');
+      expect(onError).toHaveBeenCalledWith(new Error('Internal Server Error'));
+    } finally {
+      errorSpy.mockRestore();
+    }
+  });
+
+  test('sends the resolved chat options in the request body', async () => {
+    // Asserts that caller-provided options override defaults in the payload
+    // and that signal/apiUrl are NOT part of the serialized body.
+    response = ['ok'];
+
+    await submitChat(
+      [{ content: 'Hi', role: 'user' }],
+      'testKey',
+      onAnswerChunk,
+      onReferences,
+      onConversationId,
+      onPromptId,
+      onError,
+      {
+        temperature: 0.9,
+        maxTokens: 123,
+        signal: new AbortController().signal,
+      },
+    );
+
+    const body = requestBody as { [key: string]: unknown };
+    expect(body.temperature).toBe(0.9);
+    expect(body.maxTokens).toBe(123);
+    expect(body.projectKey).toBe('testKey');
+    expect(body.messages).toStrictEqual([{ content: 'Hi', role: 'user' }]);
+    // signal and apiUrl must not leak into the request body.
+    expect(body).not.toHaveProperty('signal');
+    expect(body).not.toHaveProperty('apiUrl');
+  });
 });
