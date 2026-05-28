@@ -19,6 +19,17 @@ on:
   pull_request:
   push:
     branches: [main]
+# NODE: pinned to 20 (not the fleet-default 24) for this repo. The SDK's test
+# stack uses msw@1, whose fetch interceptor rebuilds outgoing Requests through
+# Node's undici. The undici shipped in Node 24 rejects the jsdom AbortSignal the
+# React hooks pass to fetch ("Expected signal to be an instance of AbortSignal"),
+# failing every fetch-hook test; Node 20 and 22 are unaffected (verified locally:
+# the full react suite is green on Node 22, red on Node 24). Node 20 is also what
+# the published SDK and the legacy `ci` workflow validate against, so 20 keeps CI
+# honest. Bump once msw is upgraded to v2 (its interceptor no longer round-trips
+# the signal through undici).
+env:
+  NODE_VERSION: '20'
 concurrency:
   # cancel-in-progress so a fresh push supersedes any earlier run still parked
   # in this group. (A stale run that had queued against the now-removed
@@ -49,7 +60,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
         run: npm ci
       - name: lint
@@ -74,7 +85,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
         run: npm ci
       - name: build
@@ -100,7 +111,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
         run: npm ci
       - name: test
