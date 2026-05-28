@@ -20,8 +20,12 @@ on:
   push:
     branches: [main]
 concurrency:
+  # cancel-in-progress so a fresh push supersedes any earlier run still parked
+  # in this group. (A stale run that had queued against the now-removed
+  # self-hosted pool would otherwise block new runs indefinitely under
+  # cancel-in-progress: false.)
   group: uci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
