@@ -1,5 +1,13 @@
 name: ci
 
+# RUNNER: hosted `ubuntu-latest` is pinned (not `vars.DEVDOCS_RUNNER ||
+# 'ubuntu-latest'`). devdocsai-js is the fleet's only PUBLIC repo, so hosted
+# Actions minutes are FREE and the org's private-repo billing block does not
+# apply. The repo vars DEVDOCS_RUNNER/DEVDOCS_HEAVY_RUNNER were set, which forced
+# these jobs onto a self-hosted pool with 0 runners registered for this repo,
+# hanging them QUEUED indefinitely. See ci-universal.yml for the full rationale.
+# (DEV-872)
+
 on:
   pull_request:
   push:
@@ -11,7 +19,7 @@ concurrency:
 
 jobs:
   lint:
-    runs-on: ${{ vars.DEVDOCS_RUNNER || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -29,7 +37,7 @@ jobs:
           DEVDOCSAI_PROJECT_KEY: ${{ secrets.DEVDOCSAI_PROJECT_KEY }}
 
   test:
-    runs-on: ${{ vars.DEVDOCS_RUNNER || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -41,7 +49,7 @@ jobs:
       - uses: codecov/codecov-action@v3
 
   bundle-size:
-    runs-on: ${{ vars.DEVDOCS_RUNNER || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
