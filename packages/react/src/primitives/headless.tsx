@@ -262,6 +262,27 @@ const Prompt = forwardRef<HTMLInputElement, PromptProps>(
 );
 Prompt.displayName = 'DevDocsAI.Prompt';
 
+interface UseCopyToClipboardProps {
+  content: string;
+}
+
+function useCopyToClipboard({ content }: UseCopyToClipboardProps): {
+  didCopy: boolean;
+  handleClick: () => void;
+} {
+  const [didCopy, setDidCopy] = React.useState(false);
+
+  const handleClick = (): void => {
+    navigator.clipboard.writeText(content);
+    setDidCopy(true);
+    setTimeout(() => {
+      setDidCopy(false);
+    }, 2000);
+  };
+
+  return { handleClick, didCopy };
+}
+
 // TODO: find the right type definition for children. There is a mismatch
 // between the type that react-markdown exposes, and what is actually
 // serves.
@@ -270,16 +291,30 @@ interface CopyCodeButtonProps {
   children?: any;
 }
 
-function CopyCodeButton(props: CopyCodeButtonProps): ReactElement {
-  const [didCopy, setDidCopy] = React.useState(false);
+// CopyCodeButton receives children in two shapes:
+//  - a plain string (e.g. the rendered answer text passed by PromptView), or
+//  - the react-markdown code-block element tree, where the copyable text is
+//    nested at children[0].props.children[0].
+// Reading children[0] on a string yields its first character, so the answer-
+// copy path used to copy an empty/single-char value. Normalize both shapes.
+function extractCopyableText(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  children: any,
+): string {
+  if (typeof children === 'string') return children;
+  if (Array.isArray(children)) {
+    const nested = children[0]?.props?.children?.[0];
+    if (typeof nested === 'string') return nested;
+  }
+  const nested = children?.props?.children?.[0];
+  if (typeof nested === 'string') return nested;
+  return '';
+}
 
-  const handleClick = (): void => {
-    navigator.clipboard.writeText(props.children[0]?.props.children[0]);
-    setDidCopy(true);
-    setTimeout(() => {
-      setDidCopy(false);
-    }, 2000);
-  };
+function CopyCodeButton(props: CopyCodeButtonProps): ReactElement {
+  const { handleClick, didCopy } = useCopyToClipboard({
+    content: extractCopyableText(props.children),
+  });
 
   return (
     <button
@@ -592,6 +627,8 @@ export {
   SearchResult,
   SearchResults,
   Title,
+  useCopyToClipboard,
+  CopyCodeButton,
   type AnswerProps,
   type AutoScrollerProps,
   type CloseProps,

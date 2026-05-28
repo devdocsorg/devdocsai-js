@@ -140,6 +140,7 @@ export function PromptView(props: PromptViewProps): ReactElement {
         feedbackOptions={feedbackOptions}
         onDidSelectReference={onDidSelectReference}
         promptId={promptId}
+        promptOptions={promptOptions}
         references={references}
         referencesOptions={referencesOptions}
         defaultView={promptOptions.defaultView}
@@ -182,6 +183,7 @@ interface AnswerContainerProps {
   abortFeedbackRequest: UseFeedbackResult['abort'];
   promptId?: string;
   onDidSelectDefaultViewPrompt?: (prompt: string) => void;
+  promptOptions: DevDocsAIOptions['prompt'];
 }
 
 function AnswerContainer(props: AnswerContainerProps): ReactElement {
@@ -197,6 +199,7 @@ function AnswerContainer(props: AnswerContainerProps): ReactElement {
     submitFeedback,
     defaultView,
     onDidSelectDefaultViewPrompt,
+    promptOptions,
   } = props;
 
   if ((!answer || answer.length === 0) && state === 'indeterminate') {
@@ -219,6 +222,13 @@ function AnswerContainer(props: AnswerContainerProps): ReactElement {
         scrollTrigger={answer}
       >
         <Answer answer={answer} state={state} />
+        {promptOptions?.allowCopy && state === 'done' ? (
+          <div className="DevDocsAICopyContainer">
+            <BaseDevDocsAI.CopyCodeButton>
+              {answer}
+            </BaseDevDocsAI.CopyCodeButton>
+          </div>
+        ) : null}
         {feedbackOptions?.enabled && state === 'done' && (
           <Feedback
             variant="text"

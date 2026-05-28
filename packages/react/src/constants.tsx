@@ -203,6 +203,7 @@ export const DEFAULT_DEVDOCSAI_OPTIONS = {
     placeholder: 'Ask AI…',
     errorText:
       'Sorry, it looks like the bot is having a hard time! Please try again in a few minutes.',
+    allowCopy: false,
   },
   references: {
     loadingText: 'Fetching relevant pages…',
