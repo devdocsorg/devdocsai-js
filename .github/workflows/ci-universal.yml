@@ -1,0 +1,118 @@
+# Universal CI — DEV profile. Inlined (not the org reusable workflow) because
+# devdocsai-js is the only PUBLIC repo in the fleet and GitHub denies a public
+# repo access to the PRIVATE devdocsorg/ci-workflows reusable workflow
+# (access_level=organization grants private/internal repos only), which made
+# the caller compile to 0 jobs and fail at 0s. Mirrors reusable-node-ci.yml@v1
+# for npm. build soft until env+browser-deps wired (DEV-873/861). DEV-872.
+#
+# RUNNER: hosted `ubuntu-latest` is PINNED here, NOT the `vars.DEVDOCS_RUNNER ||
+# 'ubuntu-latest'` selector the private fleet uses. That selector exists to dodge
+# the org's *private-repo* hosted-Actions billing block by routing to the
+# self-hosted `devdocs-local`/`devdocs-local-heavy` pool. devdocsai-js is PUBLIC,
+# so hosted minutes are FREE and the billing block does not apply. The repo vars
+# DEVDOCS_RUNNER/DEVDOCS_HEAVY_RUNNER were nonetheless set, which forced these
+# jobs onto a self-hosted pool with 0 runners registered for this repo → jobs
+# hung QUEUED forever. Pinning ubuntu-latest makes this public repo's CI run on
+# free hosted runners independent of those vars. (DEV-872)
+name: Universal CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+# NODE: pinned to 20 (not the fleet-default 24) for this repo. The SDK's test
+# stack uses msw@1, whose fetch interceptor rebuilds outgoing Requests through
+# Node's undici. The undici shipped in Node 24 rejects the jsdom AbortSignal the
+# React hooks pass to fetch ("Expected signal to be an instance of AbortSignal"),
+# failing every fetch-hook test; Node 20 and 22 are unaffected (verified locally:
+# the full react suite is green on Node 22, red on Node 24). Node 20 is also what
+# the published SDK and the legacy `ci` workflow validate against, so 20 keeps CI
+# honest. Bump once msw is upgraded to v2 (its interceptor no longer round-trips
+# the signal through undici).
+env:
+  NODE_VERSION: '20'
+concurrency:
+  # cancel-in-progress so a fresh push supersedes any earlier run still parked
+  # in this group. (A stale run that had queued against the now-removed
+  # self-hosted pool would otherwise block new runs indefinitely under
+  # cancel-in-progress: false.)
+  group: uci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Write CI build env (.env.local)
+        env:
+          CI_DOTENV: ${{ secrets.CI_DOTENV }}
+        shell: bash
+        run: |
+          if [ -n "${CI_DOTENV:-}" ]; then
+            printf '%s\n' "$CI_DOTENV" > .env.local
+            echo "Wrote $(grep -c '=' .env.local) vars to .env.local"
+          else
+            echo "No CI_DOTENV secret set — relying on repo defaults."
+          fi
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        run: npm ci
+      - name: lint
+        run: npm run lint
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Write CI build env (.env.local)
+        env:
+          CI_DOTENV: ${{ secrets.CI_DOTENV }}
+        shell: bash
+        run: |
+          if [ -n "${CI_DOTENV:-}" ]; then
+            printf '%s\n' "$CI_DOTENV" > .env.local
+            echo "Wrote $(grep -c '=' .env.local) vars to .env.local"
+          else
+            echo "No CI_DOTENV secret set — relying on repo defaults."
+          fi
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        run: npm ci
+      - name: build
+        continue-on-error: true
+        run: npm run build
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Write CI build env (.env.local)
+        env:
+          CI_DOTENV: ${{ secrets.CI_DOTENV }}
+        shell: bash
+        run: |
+          if [ -n "${CI_DOTENV:-}" ]; then
+            printf '%s\n' "$CI_DOTENV" > .env.local
+            echo "Wrote $(grep -c '=' .env.local) vars to .env.local"
+          else
+            echo "No CI_DOTENV secret set — relying on repo defaults."
+          fi
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        run: npm ci
+      - name: test
+        run: npm run test
