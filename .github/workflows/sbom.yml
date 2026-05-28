@@ -1,0 +1,47 @@
+# SOC 2 CC7.1: release SBOM generation for the DevDocs.ai JavaScript SDK.
+
+name: SBOM
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cyclonedx:
+    name: Generate CycloneDX SBOM
+    runs-on: ${{ vars.DEVDOCS_RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+
+      - name: Generate CycloneDX SBOM with Syft
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: cyclonedx-json
+          output-file: sbom.cdx.json
+
+      - name: Upload workflow SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: devdocsai-js-sbom-cyclonedx
+          path: sbom.cdx.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Attach SBOM to release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run:
+          gh release upload "${{ github.event.release.tag_name }}" sbom.cdx.json
+          --clobber
