@@ -57,14 +57,16 @@ jobs:
           else
             echo "No CI_DOTENV secret set — relying on repo defaults."
           fi
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
       - name: lint
-        run: npm run lint
+        run: pnpm run lint
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -82,15 +84,17 @@ jobs:
           else
             echo "No CI_DOTENV secret set — relying on repo defaults."
           fi
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
       - name: build
         continue-on-error: true
-        run: npm run build
+        run: pnpm run build
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -108,11 +112,13 @@ jobs:
           else
             echo "No CI_DOTENV secret set — relying on repo defaults."
           fi
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
       - name: test
-        run: npm run test
+        run: pnpm run test
