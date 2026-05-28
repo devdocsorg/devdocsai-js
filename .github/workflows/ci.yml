@@ -19,14 +19,16 @@ concurrency:
 
 env:
   COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
-  # NODE: pinned to 20 (not the repo's runtime target of 24). The SDK's test
-  # stack uses msw@1, whose fetch interceptor rebuilds outgoing Requests through
-  # Node's undici. The undici shipped in Node 24 rejects the jsdom AbortSignal the
-  # React hooks pass to fetch ("Expected signal to be an instance of AbortSignal"),
-  # failing every fetch-hook test; Node 20 and 22 are unaffected. Node 20 is also
-  # what the published SDK validates against. Bump once msw is upgraded to v2.
-  # Mirrors ci-universal.yml. (DEV-872 / phase0)
-  NODE_VERSION: '20'
+  # NODE: pinned to 22 (not the repo's runtime target of 24). Two constraints
+  # bracket the version:
+  #   - UPPER: the test stack uses msw@1, whose fetch interceptor rebuilds
+  #     outgoing Requests through Node's undici. The undici in Node 24 rejects
+  #     jsdom's AbortSignal ("Expected signal to be an instance of AbortSignal"),
+  #     failing every fetch-hook test. Node <= 22 is unaffected.
+  #   - LOWER: pnpm 11.0.9 (the repo's packageManager pin) requires Node >= 22.13,
+  #     so Node 20 crashes the pnpm CLI ("requires at least Node.js v22.13").
+  # Node 22 satisfies both. Bump to 24 once msw is upgraded to v2. (DEV-872 / phase0)
+  NODE_VERSION: '22'
 
 jobs:
   lint:
