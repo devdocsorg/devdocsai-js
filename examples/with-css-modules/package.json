@@ -2,6 +2,7 @@
   "name": "with-css-modules",
   "version": "0.0.1",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "build": "tsc && vite build",

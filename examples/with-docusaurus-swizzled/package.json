@@ -2,6 +2,7 @@
   "name": "with-docusaurus-swizzled",
   "version": "0.0.3",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "build": "docusaurus build",
     "clear": "docusaurus clear",

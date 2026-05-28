@@ -1,6 +1,7 @@
 {
   "name": "devdocsai",
   "private": true,
+  "license": "MIT",
   "workspaces": [
     "examples/*",
     "packages/*"
