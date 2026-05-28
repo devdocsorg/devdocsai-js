@@ -11,6 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Generate CycloneDX SBOM (pnpm lockfile)
-        run: npx --yes @cyclonedx/cdxgen@latest -t pnpm -o sbom.json --no-recurse
+        run:
+          npx --yes @cyclonedx/cdxgen@latest -t pnpm -o sbom.json --no-recurse
       - uses: actions/upload-artifact@v4
         with: { name: sbom, path: sbom.json }

@@ -45,16 +45,10 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build:packages
       - run: >
-          pnpm
-          --filter with-css-modules
-          --filter with-custom-trigger
-          --filter with-custom-trigger-react
-          --filter with-docusaurus
-          --filter with-docusaurus-swizzled
-          --filter with-init
-          --filter with-devdocsai-web
-          --filter with-next
-          run build
+          pnpm --filter with-css-modules --filter with-custom-trigger --filter
+          with-custom-trigger-react --filter with-docusaurus --filter
+          with-docusaurus-swizzled --filter with-init --filter
+          with-devdocsai-web --filter with-next run build
         env:
           DEVDOCSAI_PROJECT_KEY: ${{ secrets.DEVDOCSAI_PROJECT_KEY }}
 

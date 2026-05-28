@@ -247,8 +247,14 @@ describe('SearchView', () => {
       ),
     );
 
-    // select item on mousemove
-    await userEvent.hover(screen.getByRole('link', { name: 'result 2' }));
+    // select item on mousemove. The component selects on `onMouseMove` (not
+    // hover/enter — see SearchView). userEvent v14's `hover()` dispatches a
+    // pointer sequence whose `mousemove` does not reliably reach React's
+    // synthetic onMouseMove under jsdom, so the selection never advances. As
+    // with the keyboard events above, dispatch the event the handler actually
+    // listens for directly via fireEvent — this still exercises the
+    // SearchView's own onMouseMove selection logic.
+    fireEvent.mouseMove(screen.getByRole('link', { name: 'result 2' }));
 
     await waitFor(() =>
       expect(screen.getByRole('option', { selected: true })).toHaveAttribute(

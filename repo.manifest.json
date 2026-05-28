@@ -2,7 +2,11 @@
   "repo": "devdocsai-js",
   "target": "packages/js-sdk",
   "type": "package",
-  "standards": { "packageManager": "pnpm", "node": "24", "framework": "n/a (library; @devdocsai/react peers React 19)" },
+  "standards": {
+    "packageManager": "pnpm",
+    "node": "24",
+    "framework": "n/a (library; @devdocsai/react peers React 19)"
+  },
   "promotionOrder": "1-leaf",
   "status": "phase0-complete; npm-workspace->pnpm + Node24 migrated and validated (see MONOREPO-PREP.md)"
 }
