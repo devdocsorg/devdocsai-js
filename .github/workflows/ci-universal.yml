@@ -19,17 +19,18 @@ on:
   pull_request:
   push:
     branches: [main]
-# NODE: pinned to 20 (not the fleet-default 24) for this repo. The SDK's test
-# stack uses msw@1, whose fetch interceptor rebuilds outgoing Requests through
-# Node's undici. The undici shipped in Node 24 rejects the jsdom AbortSignal the
-# React hooks pass to fetch ("Expected signal to be an instance of AbortSignal"),
-# failing every fetch-hook test; Node 20 and 22 are unaffected (verified locally:
-# the full react suite is green on Node 22, red on Node 24). Node 20 is also what
-# the published SDK and the legacy `ci` workflow validate against, so 20 keeps CI
-# honest. Bump once msw is upgraded to v2 (its interceptor no longer round-trips
-# the signal through undici).
+# NODE: pinned to 22 (not the fleet-default 24) for this repo. Two constraints
+# bracket the version:
+#   - UPPER: the SDK's test stack uses msw@1, whose fetch interceptor rebuilds
+#     outgoing Requests through Node's undici. The undici in Node 24 rejects the
+#     jsdom AbortSignal the React hooks pass to fetch ("Expected signal to be an
+#     instance of AbortSignal"), failing every fetch-hook test; Node <= 22 is
+#     unaffected (the full react suite is green on Node 22, red on Node 24).
+#   - LOWER: this repo is now pnpm-based and pnpm 11.0.9 requires Node >= 22.13,
+#     so Node 20 crashes the pnpm CLI.
+# Node 22 satisfies both. Bump to 24 once msw is upgraded to v2.
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '22'
 concurrency:
   # cancel-in-progress so a fresh push supersedes any earlier run still parked
   # in this group. (A stale run that had queued against the now-removed
@@ -57,14 +58,16 @@ jobs:
           else
             echo "No CI_DOTENV secret set — relying on repo defaults."
           fi
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
       - name: lint
-        run: npm run lint
+        run: pnpm run lint
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -82,15 +85,17 @@ jobs:
           else
             echo "No CI_DOTENV secret set — relying on repo defaults."
           fi
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
       - name: build
         continue-on-error: true
-        run: npm run build
+        run: pnpm run build
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -108,11 +113,13 @@ jobs:
           else
             echo "No CI_DOTENV secret set — relying on repo defaults."
           fi
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
       - name: test
-        run: npm run test
+        run: pnpm run test

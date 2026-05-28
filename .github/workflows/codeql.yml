@@ -1,0 +1,25 @@
+name: CodeQL
+on:
+  push: { branches: [main] }
+  pull_request: { branches: [main] }
+  schedule: [{ cron: '0 6 * * 1' }]
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+jobs:
+  analyze:
+    # Pinned to hosted ubuntu-latest: devdocsai-js is the only PUBLIC repo, so
+    # Actions minutes are free and `vars.DEVDOCS_RUNNER` would force this onto a
+    # self-hosted pool with 0 registered runners (hangs QUEUED). See ci.yml / DEV-872.
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      matrix:
+        language: [javascript-typescript]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+      - uses: github/codeql-action/analyze@v3
