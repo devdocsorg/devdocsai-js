@@ -160,6 +160,12 @@ export async function submitChat(
       DEFAULT_SUBMIT_CHAT_OPTIONS,
     );
 
+    // Debug logging is enabled by either the documented `options.debug` flag or
+    // the legacy positional `debug` argument. Previously only the positional
+    // argument was honored, so the documented `SubmitChatOptions.debug` option
+    // silently never produced console output.
+    const isDebug = debug || options.debug || false;
+
     const res = await fetch(apiUrl, {
       method: 'POST',
       headers: new Headers({ 'Content-Type': 'application/json' }),
@@ -180,12 +186,12 @@ export async function submitChat(
       onError(new Error(text));
 
       // eslint-disable-next-line no-console
-      if (debug) console.error(text);
+      if (isDebug) console.error(text);
 
       return;
     }
 
-    if (debug) {
+    if (isDebug) {
       const res2 = res.clone();
       const { debugInfo } = await res2.json();
       // eslint-disable-next-line no-console
