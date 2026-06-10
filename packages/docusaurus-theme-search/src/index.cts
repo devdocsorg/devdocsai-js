@@ -1,8 +1,9 @@
-import { type PluginModule } from '@docusaurus/types';
-// @ts-ignore TypeScript doesn’t allows us to import types from an ESM file in a CJS file.
-// Apart from that, TypeScript does recognize the type.
+// @ts-expect-error TypeScript doesn’t allow us to import types from an ESM
+// file in a CJS file. Apart from that, TypeScript does recognize the type.
 import type { DevDocsAIProps } from '@devdocsai/react';
+import { type PluginModule } from '@docusaurus/types';
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 declare namespace themeSearchDevDocsAI {
   export type DevDocsAIConfig = DevDocsAIProps;
 

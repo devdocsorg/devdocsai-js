@@ -8,10 +8,10 @@ import {
 import React, {
   createContext,
   useContext,
-  useRef,
+  useEffect,
+  useState,
   type JSX,
   type ReactNode,
-  useEffect,
 } from 'react';
 import { createStore, useStore } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -409,28 +409,27 @@ interface ChatProviderProps {
 export function ChatProvider(props: ChatProviderProps): JSX.Element {
   const { chatOptions, children, debug, projectKey } = props;
 
-  const store = useRef<ChatStore | undefined>(undefined);
-
-  if (!store.current) {
-    store.current = createChatStore({
+  // useState's lazy initializer gives us a single createChatStore() call
+  // across the component's lifetime AND a value React can read during
+  // render. The previous useRef + `if (!store.current)` pattern was
+  // equivalent in behaviour but tripped the react-hooks/refs rule, which
+  // (correctly) wants ref values out of render. Subsequent option
+  // updates flow through the useEffect below.
+  const [store] = useState<ChatStore>(() =>
+    createChatStore({
       projectKey,
       chatOptions,
       debug,
       persistChatHistory: chatOptions?.history,
-    });
-  }
+    }),
+  );
 
-  // update chat options when they change
   useEffect(() => {
     if (!chatOptions) return;
-    store.current?.getState().setOptions(chatOptions);
-  }, [chatOptions]);
+    store.getState().setOptions(chatOptions);
+  }, [chatOptions, store]);
 
-  return (
-    <ChatContext.Provider value={store.current}>
-      {children}
-    </ChatContext.Provider>
-  );
+  return <ChatContext.Provider value={store}>{children}</ChatContext.Provider>;
 }
 
 export function useChatStore<T>(selector: (state: ChatStoreState) => T): T {

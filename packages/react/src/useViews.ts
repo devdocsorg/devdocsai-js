@@ -26,6 +26,20 @@ export function useViews(
     return 'prompt';
   });
 
+  // Mirror chat.enabled changes onto activeView synchronously during render,
+  // per the React "adjusting state when a prop changes" pattern. Avoids the
+  // useEffect+setState detour that triggers an extra commit and the
+  // react-hooks/set-state-in-effect rule.
+  const [prevChatEnabled, setPrevChatEnabled] = useState(chat?.enabled);
+  if (prevChatEnabled !== chat?.enabled) {
+    setPrevChatEnabled(chat?.enabled);
+    if (chat?.enabled && activeView === 'prompt') {
+      setActiveView('chat');
+    } else if (!chat?.enabled && activeView === 'chat') {
+      setActiveView('prompt');
+    }
+  }
+
   const toggleActiveView = useCallback(() => {
     switch (activeView) {
       case 'chat':
@@ -35,15 +49,6 @@ export function useViews(
         return setActiveView(chat?.enabled ? 'chat' : 'prompt');
     }
   }, [activeView, chat?.enabled]);
-
-  // update the active view when props change
-  useEffect(() => {
-    if (options.chat?.enabled && activeView === 'prompt') {
-      setActiveView('chat');
-    } else if (!options.chat?.enabled && activeView === 'chat') {
-      setActiveView('prompt');
-    }
-  }, [options.chat?.enabled, activeView]);
 
   // toggle the view when a hotkey is pressed
   useEffect(() => {
