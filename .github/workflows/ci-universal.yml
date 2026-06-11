@@ -5,15 +5,8 @@
 # the caller compile to 0 jobs and fail at 0s. Mirrors reusable-node-ci.yml@v1
 # for npm. build soft until env+browser-deps wired (DEV-873/861). DEV-872.
 #
-# RUNNER: hosted `ubuntu-latest` is PINNED here, NOT the `vars.DEVDOCS_RUNNER ||
-# 'ubuntu-latest'` selector the private fleet uses. That selector exists to dodge
-# the org's *private-repo* hosted-Actions billing block by routing to the
-# self-hosted `devdocs-local`/`devdocs-local-heavy` pool. devdocsai-js is PUBLIC,
-# so hosted minutes are FREE and the billing block does not apply. The repo vars
-# DEVDOCS_RUNNER/DEVDOCS_HEAVY_RUNNER were nonetheless set, which forced these
-# jobs onto a self-hosted pool with 0 runners registered for this repo → jobs
-# hung QUEUED forever. Pinning ubuntu-latest makes this public repo's CI run on
-# free hosted runners independent of those vars. (DEV-872)
+# Runner selection: DevDocs CI stays on the local self-hosted runner pool.
+# DEVDOCS_RUNNER may override the local label without editing workflow YAML.
 name: Universal CI
 on:
   pull_request:
